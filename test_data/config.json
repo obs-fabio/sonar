@@ -1,13 +1,23 @@
 {
-    "input": "input.wav",
-    "tpsw":{
-        "default": "tpsw.wav",
-        "args": {
-            "filename" : "tpsw_512_10_5_3.wav",
-            "npts": 512,
-            "n": 10,
-            "p": 5,
-            "a": 3
-        }
+  "input": "input.wav",
+  "tpsw": {
+    "default": "tpsw.wav",
+    "args": {
+      "filename": "tpsw_args.wav",
+      "npts": 512,
+      "n": 10,
+      "p": 5,
+      "a": 3
     }
+  },
+  "lofar": {
+    "default": "lofar.tiff",
+    "args": {
+      "filename": "lofar_args.tiff",
+      "npts": 2048,
+      "novr": 1920,
+      "decimation": 5,
+      "fmax": 4410
+    }
+  }
 }

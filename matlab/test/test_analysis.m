@@ -23,14 +23,36 @@ classdef test_analysis < matlab.unittest.TestCase
             tpsw_default = tpsw_default(:, 1);
             tpsw_alt = tpsw_alt(:, 1);
             
-            py_tpsw_default = tpsw(input);
-            py_tpsw_alt = tpsw(input, args.npts, args.n, args.p, args.a);
+            matlab_tpsw_default = tpsw(input);
+            matlab_tpsw_alt = tpsw(input, args.npts, args.n, args.p, args.a);
             
-            defaul_diff = nnz(py_tpsw_default - tpsw_default > 1);
-            alt_diff = nnz(py_tpsw_alt - tpsw_alt > 1);
+            defaul_diff = nnz(matlab_tpsw_default - tpsw_default > 1);
+            alt_diff = nnz(matlab_tpsw_alt - tpsw_alt > 1);
+            
+            testCase.verifyEqual(defaul_diff, 0);
+            testCase.verifyEqual(alt_diff, 0);
+        end
+        
+        function test_lofar(testCase)
+            config_file = fullfile(testCase.source_folder, 'config.json');
+            test_config = jsondecode(fileread(config_file));
+            
+            lofar_default = imread(fullfile(testCase.source_folder, test_config.lofar.default));
+            args = test_config.lofar.args;
+            lofar_alt = imread(fullfile(testCase.source_folder, args.filename));
+            
+            matlab_lofar_default = lofar(fullfile(testCase.source_folder, test_config.input));
+            matlab_lofar_default  = normalize(matlab_lofar_default)';
+            matlab_lofar_alt = lofar(fullfile(testCase.source_folder, test_config.input), args.npts, args.novr, args.fmax);
+            matlab_lofar_alt = normalize(matlab_lofar_alt)';
+            
+            defaul_diff = nnz(matlab_lofar_default - lofar_default > 1);
+            alt_diff = nnz(matlab_lofar_alt - lofar_alt > 1);
             
             testCase.verifyEqual(defaul_diff, 0);
             testCase.verifyEqual(alt_diff, 0);
         end
     end
 end
+
+
