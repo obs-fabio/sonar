@@ -1,0 +1,13 @@
+{
+    "input": "input.wav",
+    "tpsw":{
+        "default": "tpsw.wav",
+        "args": {
+            "filename" : "tpsw_512_10_5_3.wav",
+            "npts": 512,
+            "n": 10,
+            "p": 5,
+            "a": 3
+        }
+    }
+}
