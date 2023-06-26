@@ -37,8 +37,10 @@ class TestAnalysis(unittest.TestCase):
         args = test_config["tpsw"]["args"]
         _, tpsw_alt = wavfile.read(os.path.join(source_folder, args["filename"]))
 
-        tpsw_default = tpsw_default[:, np.newaxis]
-        tpsw_alt = tpsw_alt[:, np.newaxis]
+        if tpsw_default.ndim == 1:
+            tpsw_default = tpsw_default[:, np.newaxis]
+        if tpsw_alt.ndim == 1:
+            tpsw_alt = tpsw_alt[:, np.newaxis]
 
         py_tpsw_default = tpsw(input)
         py_tpsw_alt = tpsw(input, args["npts"], args["n"], args["p"], args["a"])
@@ -48,4 +50,3 @@ class TestAnalysis(unittest.TestCase):
 
         self.assertTrue(defaul_diff == 0)
         self.assertTrue(alt_diff == 0)
-
