@@ -10,6 +10,9 @@
       "a": 3
     }
   },
+  "spectrogram": {
+    "default": "spectrogram.tiff"
+  },
   "lofar": {
     "default": "lofar.tiff",
     "args": {

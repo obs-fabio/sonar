@@ -20,6 +20,11 @@ tpsw_config.args = args;
 config.tpsw = tpsw_config;
 
 
+% SPECTOGRAM
+spectrogram_config = struct();
+spectrogram_config.default = 'spectrogram.tiff';
+config.spectrogram = spectrogram_config;
+
 % LOFAR
 lofar_config = struct();
 lofar_config.default = 'lofar.tiff';
@@ -60,6 +65,11 @@ audiowrite(fullfile(data_folder, tpsw_config.default), t, FS);
 
 t = tpsw(y, args.npts, args.n, args.p, args.a);
 audiowrite(fullfile(data_folder, args.filename), t, FS);
+
+%%
+S = custom_spectrogram(fullfile(data_folder, config.input));
+S = normalize(S);
+export_tiff(S, fullfile(data_folder, spectrogram_config.default))
 
 %%
 B = lofar(fullfile(data_folder, config.input));
