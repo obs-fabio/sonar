@@ -19,5 +19,13 @@
       "decimation": 5,
       "fmax": 4410
     }
+  },
+  "mel": {
+    "default": "mel.tiff",
+    "args": {
+      "filename": "mel_args.tiff",
+      "n_mels": 64,
+      "decimation": 5
+    }
   }
 }

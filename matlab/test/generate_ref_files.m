@@ -5,6 +5,7 @@ data_folder="./test_data/";
 config = struct();
 config.input = 'input.wav';
 
+% TPSW
 tpsw_config = struct();
 tpsw_config.default = 'tpsw.wav';
 
@@ -19,6 +20,7 @@ tpsw_config.args = args;
 config.tpsw = tpsw_config;
 
 
+% LOFAR
 lofar_config = struct();
 lofar_config.default = 'lofar.tiff';
 
@@ -32,13 +34,26 @@ lofar_args.fmax = 44100/2/lofar_args.decimation;
 lofar_config.args = lofar_args;
 config.lofar = lofar_config;
 
+% MELGRAM
+mel_config = struct();
+mel_config.default = 'mel.tiff';
+
+mel_args = struct();
+mel_args.filename = 'mel_args.tiff';
+mel_args.n_mels = 64;
+mel_args.decimation = 5;
+
+mel_config.args = mel_args;
+config.mel = mel_config;
+
+
+% saving JSON
+
 fid = fopen(fullfile(data_folder, 'config.json'), 'w');
 fwrite(fid, jsonencode(config, PrettyPrint=true), 'char');
 fclose(fid);
 
 %%
-info = audioinfo(fullfile(data_folder, config.input));
-[y, FS] = audioread(fullfile(data_folder, config.input));
 
 t = tpsw(y);
 audiowrite(fullfile(data_folder, tpsw_config.default), t, FS);
@@ -54,3 +69,15 @@ export_tiff(B, fullfile(data_folder, lofar_config.default))
 B = lofar(fullfile(data_folder, config.input), lofar_args.npts, lofar_args.novr, lofar_args.fmax);
 B = normalize(B)';
 export_tiff(B, fullfile(data_folder, lofar_args.filename))
+
+%%
+info = audioinfo(fullfile(data_folder, config.input));
+[y, FS] = audioread(fullfile(data_folder, config.input));
+
+S = melgram(y(:,1), FS);
+S = normalize(S);
+export_tiff(S, fullfile(data_folder, mel_config.default))
+
+S = melgram(y(:,1), FS, mel_args.n_mels, mel_args.decimation);
+S = normalize(S);
+export_tiff(S, fullfile(data_folder, mel_args.filename))
