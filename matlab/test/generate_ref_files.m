@@ -32,8 +32,8 @@ lofar_config.default = 'lofar.tiff';
 lofar_args = struct();
 lofar_args.filename = 'lofar_args.tiff';
 lofar_args.npts = 2048;
-lofar_args.novr = 2048-128;
-lofar_args.decimation = 5;
+lofar_args.novr = 2048-512;
+lofar_args.decimation = 1;
 lofar_args.fmax = 44100/2/lofar_args.decimation;
 
 lofar_config.args = lofar_args;
@@ -45,8 +45,9 @@ mel_config.default = 'mel.tiff';
 
 mel_args = struct();
 mel_args.filename = 'mel_args.tiff';
-mel_args.n_mels = 64;
-mel_args.decimation = 5;
+mel_args.n_fft = 1024;
+mel_args.n_mels = 128;
+mel_args.decimation = 3;
 
 mel_config.args = mel_args;
 config.mel = mel_config;
@@ -59,6 +60,7 @@ fwrite(fid, jsonencode(config, PrettyPrint=true), 'char');
 fclose(fid);
 
 %%
+[y, FS] = audioread(fullfile(data_folder, config.input));
 
 t = tpsw(y);
 audiowrite(fullfile(data_folder, tpsw_config.default), t, FS);
@@ -88,6 +90,6 @@ S = melgram(y(:,1), FS);
 S = normalize(S);
 export_tiff(S, fullfile(data_folder, mel_config.default))
 
-S = melgram(y(:,1), FS, mel_args.n_mels, mel_args.decimation);
+S = melgram(y(:,1), FS, mel_args.n_fft, mel_args.n_mels, mel_args.decimation);
 S = normalize(S);
 export_tiff(S, fullfile(data_folder, mel_args.filename))

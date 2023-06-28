@@ -18,17 +18,18 @@
     "args": {
       "filename": "lofar_args.tiff",
       "npts": 2048,
-      "novr": 1920,
-      "decimation": 5,
-      "fmax": 4410
+      "novr": 1536,
+      "decimation": 1,
+      "fmax": 22050
     }
   },
   "mel": {
     "default": "mel.tiff",
     "args": {
       "filename": "mel_args.tiff",
-      "n_mels": 64,
-      "decimation": 5
+      "n_fft": 1024,
+      "n_mels": 128,
+      "decimation": 3
     }
   }
 }
