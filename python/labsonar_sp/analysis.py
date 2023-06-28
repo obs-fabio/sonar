@@ -1,6 +1,8 @@
+from enum import Enum
 import numpy as np
 import scipy.signal as sci
 import librosa
+
 
 def normalize(x, type=0):
     if type == 0: # normalize between 0 and 1
@@ -75,6 +77,8 @@ def spectrogram(data, fs, n_pts=1024, n_overlap=0, decimation_rate=1):
                                     scaling='spectrum',
                                     mode='complex')
     power = np.abs(power)*n_pts/2
+    power = power[1:,:]
+    freq = freq[1:]
     return power, freq, time
 
 def log_spectrogram(data, fs, n_pts=1024, n_overlap=0, decimation_rate=1):
@@ -94,7 +98,7 @@ def lofar(data, fs, n_pts=1024, n_overlap=0, decimation_rate=1):
     power[power < -0.2] = 0
     return power, freq, time
 
-def melgrama(data, fs, n_pts=1024, n_overlap=0, n_mels=256, decimation_rate=1):
+def melgram(data, fs, n_pts=1024, n_overlap=0, n_mels=256, decimation_rate=1):
 
     n_fft=n_pts*2
     n_overlap *= 2
@@ -128,7 +132,15 @@ def melgrama(data, fs, n_pts=1024, n_overlap=0, n_mels=256, decimation_rate=1):
     return S_dB, freqs, times
 
 
-# signal=sp.normalize(signal, 1)
-# S_dB = 20*np.log10(S)
+class Analysis(Enum): 
+    SPECTROGRAM = 1
+    LOG_SPECTROGRAM = 2
+    LOFAR = 3
+    LOFARGRAM = 3
+    MELGRAM = 4
 
-# S_dB = sp.normalize(S_dB)
+    def __str__(self):
+        return str(self.name).split('.')[-1].lower()
+
+    def eval(self, *args, **kwargs):
+        return globals()[self.__str__()](*args, **kwargs)
