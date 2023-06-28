@@ -93,3 +93,42 @@ def lofar(data, fs, n_pts=1024, n_overlap=0, decimation_rate=1):
     aux = power
     power[power < -0.2] = 0
     return power, freq, time
+
+def melgrama(data, fs, n_pts=1024, n_overlap=0, n_mels=256, decimation_rate=1):
+
+    n_fft=n_pts*2
+    n_overlap *= 2
+    hop_length=n_fft-n_overlap
+    discard=int(np.floor(n_fft/hop_length))
+
+    if decimation_rate > 1:
+        data = sci.decimate(data, decimation_rate)
+        fs = fs/decimation_rate
+
+    fmax=fs/2
+    n_data = normalize(data, 1).astype(float)
+    S = librosa.feature.melspectrogram(
+                    y=n_data,
+                    sr=fs,
+                    n_fft=n_fft,
+                    hop_length=hop_length,
+                    win_length=n_fft,
+                    window=np.hanning(n_fft),
+                    n_mels=n_mels,
+                    power=2,
+                    fmax=fmax)
+    S_dB = librosa.power_to_db(S, ref=np.max)
+    S_dB = S_dB[:,discard:]
+
+    freqs = librosa.core.mel_frequencies(n_mels=n_mels, fmin=0.0, fmax=fmax)
+
+    start_time = n_pts/fs
+    step_time = (n_fft-n_overlap)/fs
+    times = [start_time + step_time * valor for valor in range(S_dB.shape[1])]
+    return S_dB, freqs, times
+
+
+# signal=sp.normalize(signal, 1)
+# S_dB = 20*np.log10(S)
+
+# S_dB = sp.normalize(S_dB)
