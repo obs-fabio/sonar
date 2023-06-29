@@ -51,7 +51,7 @@ def tpsw(x, npts=None, n=None, p=None, a=None):
     mx[npts-ix:npts,:]=mx[npts-ix:npts,:]*(np.matmul(np.flipud(mult),np.ones((1,x.shape[1]))))
     return mx
 
-def spectrogram(data, fs, n_pts=1024, n_overlap=0, decimation_rate=1):
+def spectrogram(data, fs, n_pts=1024, n_overlap=0, decimation_rate=1, **kwargs):
 
     data = data - np.mean(data)
 
@@ -81,7 +81,7 @@ def spectrogram(data, fs, n_pts=1024, n_overlap=0, decimation_rate=1):
     freq = freq[1:]
     return power, freq, time
 
-def log_spectrogram(data, fs, n_pts=1024, n_overlap=0, decimation_rate=1):
+def log_spectrogram(data, fs, n_pts=1024, n_overlap=0, decimation_rate=1, **kwargs):
 
     power, freq, time = spectrogram(data, fs, n_pts, n_overlap, decimation_rate)
     aux = power
@@ -90,7 +90,7 @@ def log_spectrogram(data, fs, n_pts=1024, n_overlap=0, decimation_rate=1):
 
     return power, freq, time
 
-def lofar(data, fs, n_pts=1024, n_overlap=0, decimation_rate=1):
+def lofar(data, fs, n_pts=1024, n_overlap=0, decimation_rate=1, **kwargs):
 
     power, freq, time = log_spectrogram(data, fs, n_pts, n_overlap, decimation_rate)
     power = power - tpsw(power)
@@ -98,7 +98,7 @@ def lofar(data, fs, n_pts=1024, n_overlap=0, decimation_rate=1):
     power[power < -0.2] = 0
     return power, freq, time
 
-def melgram(data, fs, n_pts=1024, n_overlap=0, n_mels=256, decimation_rate=1):
+def melgram(data, fs, n_pts=1024, n_overlap=0, n_mels=256, decimation_rate=1, **kwargs):
 
     n_fft=n_pts*2
     n_overlap *= 2
