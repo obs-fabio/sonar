@@ -25,6 +25,7 @@ def create_window_dataframe(analysis: sp.Analysis,
                             input_dir: str,
                             output_filename: str,
                             extension: str = ".wav",
+                            output_dir: str = "/tmp/labsonar/" + get_random_string(10),
                             extract_class: Callable[[str], str] = get_class,
                             extract_file_id: Callable[[str], str] = get_file_id,
                             **kwargs):
@@ -36,7 +37,7 @@ def create_window_dataframe(analysis: sp.Analysis,
                         **kwargs
                     )
 
-    output_dir = "/tmp/labsonar/" + get_random_string(10)
+    
 
     file_map_list = manager.eval_dir(input_dir=input_dir, output_dir=output_dir, extension=extension)
 
