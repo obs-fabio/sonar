@@ -1,6 +1,8 @@
+from enum import Enum
 import numpy as np
 import scipy.signal as sci
 import librosa
+
 
 def normalize(x, type=0):
     if type == 0: # normalize between 0 and 1
@@ -49,7 +51,7 @@ def tpsw(x, npts=None, n=None, p=None, a=None):
     mx[npts-ix:npts,:]=mx[npts-ix:npts,:]*(np.matmul(np.flipud(mult),np.ones((1,x.shape[1]))))
     return mx
 
-def spectrogram(data, fs, n_pts=1024, n_overlap=0, decimation_rate=1):
+def spectrogram(data, fs, n_pts=1024, n_overlap=0, decimation_rate=1, **kwargs):
 
     data = data - np.mean(data)
 
@@ -75,9 +77,11 @@ def spectrogram(data, fs, n_pts=1024, n_overlap=0, decimation_rate=1):
                                     scaling='spectrum',
                                     mode='complex')
     power = np.abs(power)*n_pts/2
+    power = power[1:,:]
+    freq = freq[1:]
     return power, freq, time
 
-def log_spectrogram(data, fs, n_pts=1024, n_overlap=0, decimation_rate=1):
+def log_spectrogram(data, fs, n_pts=1024, n_overlap=0, decimation_rate=1, **kwargs):
 
     power, freq, time = spectrogram(data, fs, n_pts, n_overlap, decimation_rate)
     aux = power
@@ -86,10 +90,57 @@ def log_spectrogram(data, fs, n_pts=1024, n_overlap=0, decimation_rate=1):
 
     return power, freq, time
 
-def lofar(data, fs, n_pts=1024, n_overlap=0, decimation_rate=1):
+def lofar(data, fs, n_pts=1024, n_overlap=0, decimation_rate=1, **kwargs):
 
     power, freq, time = log_spectrogram(data, fs, n_pts, n_overlap, decimation_rate)
     power = power - tpsw(power)
     aux = power
     power[power < -0.2] = 0
     return power, freq, time
+
+def melgram(data, fs, n_pts=1024, n_overlap=0, n_mels=256, decimation_rate=1, **kwargs):
+
+    n_fft=n_pts*2
+    n_overlap *= 2
+    hop_length=n_fft-n_overlap
+    discard=int(np.floor(n_fft/hop_length))
+
+    if decimation_rate > 1:
+        data = sci.decimate(data, decimation_rate)
+        fs = fs/decimation_rate
+
+    fmax=fs/2
+    n_data = normalize(data, 1).astype(float)
+    S = librosa.feature.melspectrogram(
+                    y=n_data,
+                    sr=fs,
+                    n_fft=n_fft,
+                    hop_length=hop_length,
+                    win_length=n_fft,
+                    window=np.hanning(n_fft),
+                    n_mels=n_mels,
+                    power=2,
+                    fmax=fmax)
+    S_dB = librosa.power_to_db(S, ref=np.max)
+    S_dB = S_dB[:,discard:]
+
+    freqs = librosa.core.mel_frequencies(n_mels=n_mels, fmin=0.0, fmax=fmax)
+
+    start_time = n_pts/fs
+    step_time = (n_fft-n_overlap)/fs
+    times = [start_time + step_time * valor for valor in range(S_dB.shape[1])]
+    return S_dB, freqs, times
+
+
+class Analysis(Enum): 
+    SPECTROGRAM = 1
+    LOG_SPECTROGRAM = 2
+    LOFAR = 3
+    LOFARGRAM = 3
+    MELGRAM = 4
+
+    def __str__(self):
+        return str(self.name).split('.')[-1].lower()
+
+    def eval(self, *args, **kwargs):
+        return globals()[self.__str__()](*args, **kwargs)
