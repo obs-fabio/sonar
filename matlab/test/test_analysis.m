@@ -11,6 +11,26 @@ classdef test_analysis < matlab.unittest.TestCase
     end
     
     methods(Test)
+
+        function test_filtering_FIR_taps(testCase)
+            %code
+            %Testar inicialmente para filtro fir, fornecendo os taps, depois comparar com a funcao filter do matlab
+            config_file = fullfile(testCase.source_folder, 'config.json');
+            test_config = jsondecode(fileread(config_file));
+
+            taps = csvread(fullfile(testCase.source_folder, test_config.filter.h));
+            x = csvread(fullfile(testCase.source_folder, test_config.filter.in));
+            y = csvread(fullfile(testCase.source_folder, test_config.filter.out));
+            
+            %need: addpath ./matlab/Processing
+            params = FilterParams();
+            params.taps = taps;
+            test_filter = FIR_Filter(@FIR.Taps, params);
+
+            defaul_diff = nnz(y - test_filter.apply(x) > 1);
+            testCase.verifyEqual(defaul_diff, 0);
+        end
+
         function test_tpsw(testCase)
             config_file = fullfile(testCase.source_folder, 'config.json');
             test_config = jsondecode(fileread(config_file));
