@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import tikzplotlib as tikz
 import tifffile
 import scipy.io.wavfile as wav_file
+from PIL import Image
 
 import labsonar_sp.analysis as sp
 import labsonar_sp.prefered_number as sp_pn
@@ -24,9 +25,11 @@ class Plot_type(Enum):
     EXPORT_PNG = 1
     EXPORT_TIFF = 2
     EXPORT_TEX = 3
+    EXPORT_MAGMA = 4
+    EXPORT_JET = 5
 
     def get_extension(self):
-        return ["",".png",".tiff",".tex"][self.value]
+        return ["",".png",".tiff",".tex",".png",".png"][self.value]
 
 def plot(analysis: sp.Analysis, *args, plot_type: Plot_type = Plot_type.SHOW_FIG, filename: str = "fig", spectre_format: bool=False, **kwargs) -> str:
 
@@ -35,6 +38,14 @@ def plot(analysis: sp.Analysis, *args, plot_type: Plot_type = Plot_type.SHOW_FIG
 
     if analysis == sp.Analysis.LOFAR and not spectre_format:
         S = S.T
+
+    if (plot_type == Plot_type.EXPORT_MAGMA) or (plot_type == Plot_type.EXPORT_JET):
+        colormap = plt.cm.magma if (plot_type == Plot_type.EXPORT_MAGMA) else plt.cm.jet
+        S = colormap(S)
+        S_color = (S * 255).astype(np.uint8)
+        image = Image.fromarray(S_color)
+        image.save(filename)
+        return
 
     if plot_type != Plot_type.EXPORT_TIFF:
 

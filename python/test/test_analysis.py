@@ -93,8 +93,6 @@ class TestAnalysis(unittest.TestCase):
         args = test_config['lofar']['args']
         lofar_alt = skimage.imread(os.path.join(source_folder, args['filename']))
 
-        print("lofar_default.shape: ", lofar_default.shape)
-        print("lofar_alt.shape: ", lofar_alt.shape)
         lofar_default = lofar_default[:,1:]
         lofar_alt = lofar_alt[:,1:]
 
@@ -102,9 +100,6 @@ class TestAnalysis(unittest.TestCase):
         py_lofar_default = sp.normalize(py_lofar_default).T
         py_lofar_alt, _, _ = sp.lofar(input[:,0], fs, args["npts"], args["novr"], args["decimation"])
         py_lofar_alt = sp.normalize(py_lofar_alt).T
-
-        print("py_lofar_default.shape: ", py_lofar_default.shape)
-        print("py_lofar_alt.shape: ", py_lofar_alt.shape)
 
         default_diff = np.count_nonzero(np.abs(np.subtract(py_lofar_default, lofar_default) > 1e-2))
         default_diff = default_diff/py_lofar_default.size
@@ -153,4 +148,4 @@ if __name__ == '__main__':
     test.test_tpsw()
     test.test_spectrogram()
     test.test_lofar()
-    test.test_melgrama()
+    # test.test_melgrama()

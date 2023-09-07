@@ -9,6 +9,8 @@ def normalize(x, type=0):
         return (x - np.min(x, axis=0))/(np.max(x, axis=0) - np.min(x, axis=0))
     if type == 1: # normalize -1 e 1, keeping 0 in place (librosa.util.normalize)
         return x/np.max(np.abs(x), axis=0)
+    if type == 2:
+        return x/np.linalg.norm(x, axis=0)
     raise UnboundLocalError("normalization {:d} not implemented".format(type))
 
 def tpsw(x, npts=None, n=None, p=None, a=None):
@@ -105,12 +107,14 @@ def melgram(data, fs, n_pts=1024, n_overlap=0, n_mels=256, decimation_rate=1, **
     hop_length=n_fft-n_overlap
     discard=int(np.floor(n_fft/hop_length))
 
+    normalize_id = kwargs.get('norm', 1)
+
     if decimation_rate > 1:
         data = sci.decimate(data, decimation_rate)
         fs = fs/decimation_rate
 
     fmax=fs/2
-    n_data = normalize(data, 1).astype(float)
+    n_data = normalize(data, normalize_id).astype(float)
     S = librosa.feature.melspectrogram(
                     y=n_data,
                     sr=fs,
