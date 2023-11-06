@@ -1,4 +1,9 @@
 {
+  "filter": {
+    "h": "filter_h.csv",
+    "in": "filter_in.csv",
+    "out": "filter_out.csv"
+  },
   "input": "input.wav",
   "tpsw": {
     "default": "tpsw.wav",
